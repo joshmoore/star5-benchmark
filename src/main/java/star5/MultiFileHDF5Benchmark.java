@@ -31,29 +31,26 @@
 
 package star5;
 
-import org.openjdk.jmh.annotations.Benchmark;
+import net.imglib2.img.array.ArrayImg;
+import net.imglib2.img.array.ArrayImgs;
+import net.imglib2.img.basictypeaccess.array.ByteArray;
+import net.imglib2.type.numeric.integer.ByteType;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
-public class MyBenchmark {
+public class MultiFileHDF5Benchmark extends AbstractBenchmark {
 
-    @Benchmark
-    public void testMethod() {
-        File temp = null;
-        try{
-            temp = File.createTempFile("tempfile", ".tmp");
-            temp.deleteOnExit();
-            BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
-            bw.write("This is the temporary file content");
-            bw.close();
-        }catch(IOException e){
-            e.printStackTrace();
-        }finally{
-            if (temp != null) temp.delete();
-        }
+    public StorageDescriptor createDescriptor(String base) {
+        return new MultiFileHDF5StorageDescriptor(
+                "",
+                base + "-xs%04d-xe%04d-ys%04d-ye%04d-zs%04d-ze%04d-cs%d-ce%d-ts%02d-te%02d.h5",
+                "data",
+                new long[]{1024, 1024, 5, 1, 1},
+                new int[]{256, 256, 5, 1, 1},
+                null);
+    }
+
+    public ArrayImg<ByteType, ByteArray> createData() {
+        return ArrayImgs.bytes(1024, 1024, 10, 3, 6);
     }
 
 }
